@@ -26,33 +26,94 @@ namespace FlipKartWebSite.TestClasses
             
         }
 
-        [Test]
-        [Description("Verify Product Items under Header -Top delas")]
-        public void SearchProductListByCategory()
+
+        [Test,Order(1)]
+        [Description("Verify Product Items under Header -Top Deals (catergory handled dynamically)")]
+        public void VerifyProductItemsBycategory()
         {
-            _product = new ProductsPage(_driver);
+            _product= new ProductsPage(_driver);
+
             _product.NavigateUrl();
 
-           var _categoryItemCounts= _product.GetCategoryItemsList();
-
-            if (_categoryItemCounts.Count > 0)
-            {
-                
-                foreach (var kvp in _categoryItemCounts)
-                {
-                    Console.WriteLine($"{kvp.Key}=> {kvp.Value} items");
-                }
-                
-            }
-            else
-            {
-                Console.WriteLine(" No Product Items Availble");
-                Assert.Fail();
-            }
-            
+            _product.PrintProductListUnderEachcategory();
         }
 
 
+
+
+
+
+
+
+
+
+
+
+
+        
+        //[Test]
+        //[Description("Verify Product Items under Header -Top delas")]
+        //public void SearchProductListByCategory()
+        //{
+        //    _product = new ProductsPage(_driver);
+        //    _product.NavigateUrl();
+
+        //    var _categoryItemCounts = _product.GetCategoryItemsList_new();
+
+        //    if (_categoryItemCounts.Count > 0)
+        //    {
+
+        //        foreach (var kvp in _categoryItemCounts)
+        //        {
+        //           //string _header=  kvp.Key;
+
+        //            //List<string> productItems = kvp.Value;
+
+        //            Console.WriteLine($"Header :{kvp.Key},Total Items: {kvp.Value.Count}");
+
+                   
+        //            foreach(var item in kvp.Value)
+        //            {
+        //                Console.WriteLine($"  --> {item}");
+        //            }
+
+        //        }
+
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine(" No Product Items Availble");
+        //        Assert.Fail();
+        //    }
+
+        //}
+
+        //trying for fetching all the catergory names dynamically 
+        //[Test]
+        //public void VerifyProducts()
+        //{
+        //    _product = new ProductsPage(_driver);
+        //    _product.NavigateUrl();
+        //    var categoryHeaders = _product.GetCategoryHeaders();
+        //    Dictionary<string, List<string>> allProducts = new Dictionary<string, List<string>>();
+
+        //    foreach (var header in categoryHeaders)
+        //    {
+        //        string categoryName = header.Text.Trim();
+        //        var products = _product.GetProductsByCategory(header);
+        //        allProducts[categoryName] = products;
+        //    }
+
+        //    foreach (var entry in allProducts)
+        //    {
+        //        Console.WriteLine($"Category: {entry.Key}");
+        //        foreach (var product in entry.Value)
+        //        {
+        //            Console.WriteLine($" - {product}");
+        //        }
+        //    }
+        //}
+       
 
         [TearDown]
         public void CleanUp()
