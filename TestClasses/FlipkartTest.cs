@@ -7,6 +7,7 @@ using NUnit.Framework;
 using FlipKartWebSite.Drivers;
 using FlipKartWebSite.Pages;
 using OpenQA.Selenium;
+using FlipKartWebSite.Utilities;
 
 namespace FlipKartWebSite.TestClasses
 {
@@ -14,12 +15,12 @@ namespace FlipKartWebSite.TestClasses
     [TestFixture]
     public class FlipkartTest
     {
-        private IWebDriver _driver;
+        public IWebDriver _driver;
 
         private ProductsPage _product;
 
 
-        [SetUp]
+        [OneTimeSetUp]
         public void SetUp()
         {
             _driver =Driver.GetDriver();
@@ -38,6 +39,18 @@ namespace FlipKartWebSite.TestClasses
             _product.PrintProductListUnderEachcategory();
         }
 
+        //This will handle all the categories based on the test data provided in Json file
+
+        [Test,TestCaseSource(typeof(JsonDataReader),nameof(JsonDataReader.GetCategorylist),new object[] {"ConfigData.json"})]
+        [Description("Verify Product Items under Header -category Name read from Json")]
+        public void VerifyProductItemsBycategoryUsingDataReader(string category)
+        {
+            _product = new ProductsPage(_driver);
+
+            _product.NavigateUrl();
+
+            _product.PrintProductListUnderEachcategory_New(category);
+        }
 
 
 
@@ -50,7 +63,10 @@ namespace FlipKartWebSite.TestClasses
 
 
 
-        
+
+
+
+
         //[Test]
         //[Description("Verify Product Items under Header -Top delas")]
         //public void SearchProductListByCategory()
@@ -71,7 +87,7 @@ namespace FlipKartWebSite.TestClasses
 
         //            Console.WriteLine($"Header :{kvp.Key},Total Items: {kvp.Value.Count}");
 
-                   
+
         //            foreach(var item in kvp.Value)
         //            {
         //                Console.WriteLine($"  --> {item}");
@@ -113,9 +129,9 @@ namespace FlipKartWebSite.TestClasses
         //        }
         //    }
         //}
-       
 
-        [TearDown]
+
+        [OneTimeTearDown]
         public void CleanUp()
         {
             _driver.Dispose();

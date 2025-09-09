@@ -6,14 +6,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FlipKartWebSite.Utilities;
 
 namespace FlipKartWebSite.Pages
 {
-    public class ProductsPage
+    public class ProductsPage 
     {
         private readonly IWebDriver _driver;
 
-        private readonly IWebElement _categoryName;
+        //private readonly IWebElement _categoryName;
 
         private readonly IReadOnlyCollection<IWebElement> _headerNames;
         public ProductsPage(IWebDriver driver)
@@ -119,6 +120,46 @@ namespace FlipKartWebSite.Pages
                 }
 
             }
+
+        }
+        public void PrintProductListUnderEachcategory_New(string category)
+        {
+            var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(20));
+
+            //var _category = _categories.FirstOrDefault(c => c.category == CategoryName);
+
+
+            var _headerName= _driver.FindElement(By.XPath($"//div[text()='{category}']"));
+
+            var _items = wait.Until(driver => _driver.FindElements(By.XPath($"//div[contains(text(),'{category}')]/following::div[1]//a")));
+
+            var itemNames = _items.Select(item => item.GetAttribute("innerText")?.Trim()).ToList();
+
+            Console.WriteLine($"Category : {category}, Total Items : {itemNames.Count}");
+
+            foreach(var _productItems in itemNames)
+            {
+                Console.WriteLine($" ---> {_productItems}");
+            }
+
+
+
+            //var _headerNames = _driver.FindElements(By.XPath("//div[@class='_3n8fna1co _3n8fna10j _3n8fnaod _3n8fna1 _3n8fnac7 _1i2djtb9 _1i2djt0 _1i2djt9x _1i2djt7o _1i2djt36 _1i2djt5f _1i2djt36 _1i2djt5f']"));
+
+            //foreach (var header in _headerNames)
+            //{
+            //    string _headerText = header.Text.Trim();
+
+            //    var _items = wait.Until(driver => _driver.FindElements(By.XPath($"//div[contains(text(),'{_headerText}')]/following::div[1]//a")));
+
+            //    var itemNames = _items.Select(item => item.GetAttribute("innerText")?.Trim()).ToList();
+
+            //    Console.WriteLine($"header : {_headerText}, Total Items : {itemNames.Count}");
+
+            //    foreach (var _productItems in itemNames)
+            //    {
+            //        Console.WriteLine($" ---> {_productItems}");
+            //    }         
 
         }
 
