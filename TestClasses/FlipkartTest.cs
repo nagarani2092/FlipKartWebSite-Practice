@@ -24,7 +24,10 @@ namespace FlipKartWebSite.TestClasses
         public void SetUp()
         {
             _driver =Driver.GetDriver();
-            
+            _product = new ProductsPage(_driver);
+
+            _product.NavigateUrl();
+
         }
 
 
@@ -32,9 +35,6 @@ namespace FlipKartWebSite.TestClasses
         [Description("Verify Product Items under Header -Top Deals (catergory handled dynamically)")]
         public void VerifyProductItemsBycategory()
         {
-            _product= new ProductsPage(_driver);
-
-            _product.NavigateUrl();
 
             _product.PrintProductListUnderEachcategory();
         }
@@ -45,9 +45,6 @@ namespace FlipKartWebSite.TestClasses
         [Description("Verify Product Items under Header -category Name read from Json")]
         public void VerifyProductItemsBycategoryUsingDataReader(string category)
         {
-            _product = new ProductsPage(_driver);
-
-            _product.NavigateUrl();
 
             _product.PrintProductListUnderEachcategory_New(category);
         }
