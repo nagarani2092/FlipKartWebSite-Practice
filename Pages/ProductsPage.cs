@@ -1,4 +1,6 @@
-﻿using OpenQA.Selenium;
+﻿using FlipKartWebSite.Drivers;
+using FlipKartWebSite.Utilities;
+using OpenQA.Selenium;
 using OpenQA.Selenium.DevTools.V137.Network;
 using OpenQA.Selenium.Support.UI;
 using System;
@@ -6,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FlipKartWebSite.Utilities;
 
 namespace FlipKartWebSite.Pages
 {
@@ -14,16 +15,9 @@ namespace FlipKartWebSite.Pages
     {
         private readonly IWebDriver _driver;
 
-        //private readonly IWebElement _categoryName;
-
-        private readonly IReadOnlyCollection<IWebElement> _headerNames;
         public ProductsPage(IWebDriver driver)
         {
             _driver = driver;
-
-            //_productList = _driver.FindElements(By.XPath("//div[@theme='[object Object]']/following::div[contains(@class,'_3MlEpv')]//a"));
-
-
         }
 
         public void NavigateUrl()
@@ -31,15 +25,6 @@ namespace FlipKartWebSite.Pages
             _driver.Navigate().GoToUrl("https://www.flipkart.com/");
         }
 
-        //public int GetCatergoryItemCount(string categoryName)
-        //{
-        //    var header = _categoryName.Text;
-        //    var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(20));
-
-        //    var items = wait.Until(driver=>_productList);
-
-        //    return items.Count;
-        //}
 
         public Dictionary<string, int> GetCategoryItemsList()
         {
@@ -122,22 +107,39 @@ namespace FlipKartWebSite.Pages
             }
 
         }
-        public void PrintProductListUnderEachcategory_New(string category)
+        public void PrintProductListUnderEachCategoryName(string categoryName)
         {
+
+            //var elements = _driver.FindElements(By.CssSelector("div[style*='display: inline'][style*='text-overflow: ellipsis']"));
+
+            Console.WriteLine($"Catergory Name found: '{categoryName}'");
+
+            categoryName = categoryName.Trim();
+
+            IJavaScriptExecutor js = (IJavaScriptExecutor)_driver;
+           
+            var categoryelement= _driver.FindElement(By.XPath($"//*[normalize-space(text())='{categoryName}']"));
+
+            js.ExecuteScript("arguments[0].scrollIntoView(true);", categoryelement);
+
             var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(30));
 
-            //var _category = _categories.FirstOrDefault(c => c.category == CategoryName);
+            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(
+                By.XPath($"//*[normalize-space(text())='{categoryName}']/following::div[1]//a")));
 
+            long pageHeight = (long)js.ExecuteScript("return document.body.scrollHeight");
 
-            var _headerName= wait.Until(driver=>_driver.FindElement(By.XPath($"//div[normalize-space(text())='{category}']")));
+            js.ExecuteScript($"window.scrollTo(0,{pageHeight / 2});");
 
-            //var headelement= wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.XPath($"//div[contains(normalize-space(translate(.,'\u00A0','')),'{category}')]")));
+            
+           var  _items = _driver.FindElements(By.XPath($"//*[normalize-space(text()) ='{categoryName}']/following::div[1]//a"));
+            
+               
+            var itemNames = _items.Select(item => item.GetAttribute("innerText")?.Trim())
+                .Where(name => !string.IsNullOrEmpty(name))
+                .ToList();
 
-            var _items = wait.Until(driver => _driver.FindElements(By.XPath($"//div[contains(text(),'{category}')]/following::div[1]//a")));
-
-            var itemNames = _items.Select(item => item.GetAttribute("innerText")?.Trim()).ToList();
-
-            Console.WriteLine($"Category : {category}, Total Items : {itemNames.Count}");
+            Console.WriteLine($"Category : {categoryName}, Total Items : {itemNames.Count}");
 
             foreach(var _productItems in itemNames)
             {
@@ -146,12 +148,15 @@ namespace FlipKartWebSite.Pages
 
         }
 
+
+        //ignore this method
         public IList<IWebElement> GetCategoryHeaders()
         {
             return _driver.FindElements(By.XPath("//div[@class='_58bkzqcd _3n8fna1co _3n8fna10j _3n8fnaod _3n8fna1 _3n8fnac7 _58bkzqz _1i2djtb9 _1i2djt0']"));
         }
 
 
+        //ignore this method
 
         public List<string> GetProductsByCategory(IWebElement categoryHeader)
         {

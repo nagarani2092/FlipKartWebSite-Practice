@@ -1,5 +1,3 @@
-[
-  { "categoryName": "Top Deals"},
-  { "categoryName": "Tyohaar Trends"},
-  { "categoryName": "Mobiles"}  
-]
+{
+  "categoryName": [ "Top Deals", "Tyohaar Trends", "Mobiles" ]
+}
