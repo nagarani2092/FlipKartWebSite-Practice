@@ -110,26 +110,58 @@ namespace FlipKartWebSite.Pages
         public void PrintProductListUnderEachCategoryName(string categoryName)
         {
 
+
+
             //var elements = _driver.FindElements(By.CssSelector("div[style*='display: inline'][style*='text-overflow: ellipsis']"));
+            var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(30));
 
             Console.WriteLine($"Catergory Name found: '{categoryName}'");
 
             categoryName = categoryName.Trim();
 
             IJavaScriptExecutor js = (IJavaScriptExecutor)_driver;
+
+            bool elementFound = false;
            
-            var categoryelement= _driver.FindElement(By.XPath($"//*[normalize-space(text())='{categoryName}']"));
 
-            js.ExecuteScript("arguments[0].scrollIntoView(true);", categoryelement);
+            IWebElement categoryelement = null;
 
-            var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(30));
+            long lastHeight = (long)js.ExecuteScript("return document.body.scrollHeight;");
+
+            while (true) 
+            {
+                try
+                {
+                    categoryelement = _driver.FindElement(By.XPath($"//div[contains(normalize-space(text()),'{categoryName}')]"));
+
+                    js.ExecuteScript("arguments[0].scrollIntoView(true);", categoryelement);
+
+                    elementFound = true;
+                    Console.WriteLine("Category Element found.");
+                    break;
+
+                }
+                catch(NoSuchElementException)
+                {
+                    js.ExecuteScript("window.scrollBy(0,800);");
+                    Thread.Sleep(1500);
+                    long newHeight= (long)js.ExecuteScript("return document.body.scrollHeight;");
+                    if(newHeight==lastHeight)
+                    {
+                        Console.WriteLine($"reached botton of the page . Category'{categoryName}'not found.");
+                        break;
+                    }
+                    lastHeight = newHeight;
+                }
+            }
+
+            if(!elementFound)
+            {
+                throw new Exception($"Category '{categoryName}' not found after scrolling.");
+            }
 
             wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(
                 By.XPath($"//*[normalize-space(text())='{categoryName}']/following::div[1]//a")));
-
-            long pageHeight = (long)js.ExecuteScript("return document.body.scrollHeight");
-
-            js.ExecuteScript($"window.scrollTo(0,{pageHeight / 2});");
 
             
            var  _items = _driver.FindElements(By.XPath($"//*[normalize-space(text()) ='{categoryName}']/following::div[1]//a"));
